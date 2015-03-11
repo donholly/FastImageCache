@@ -75,6 +75,24 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
 - (void)setFormats:(NSArray *)formats;
 
 /**
+ Adds image formats to be used by the image cache.
+ 
+ @param formats An array of `<FICImageFormat>` objects.
+ 
+ @note Once the image formats have been set, subsequent calls to this method will do nothing.
+ */
+- (void)addFormats:(NSArray *)formats;
+
+/**
+ Add an image format to be used by the image cache.
+ 
+ @param A single `<FICImageFormat>` object.
+ 
+ @note Invoking this method vs. the above `setFormats:` call will *not* cleanup unused image formats. This method should not be used in conjunction with the `setFormats:` method above.
+ */
+- (void)addFormat:(FICImageFormat *)imageFormat;
+
+/**
  Returns an image format previously associated with the image cache.
  
  @param formatName The name of the image format to return.
@@ -197,6 +215,15 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
 ///-----------------------------------
 /// @name Checking for Image Existence
 ///-----------------------------------
+
+/**
+ Returns all formats that the image exists in the cache for
+ 
+ @param entity The entity that uniquely identifies the source image.
+ 
+ @return An array of `<FICImageFormat>` objects that identify the formats which the entity is cached in
+ */
+- (NSArray *)imageFormatsEntityExistsIn:(id <FICEntity>)entity;
 
 /**
  Returns whether or not an image exists in the image cache.
