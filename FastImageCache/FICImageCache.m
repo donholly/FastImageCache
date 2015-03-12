@@ -138,13 +138,15 @@ static FICImageCache *__imageCache = nil;
     NSString *formatName = [imageFormat name];
     FICImageFormatDevices devices = [imageFormat devices];
     if (devices & currentDevice) {
-        // Only initialize an image table for this format if it is needed on the current device.
-        FICImageTable *imageTable = [[FICImageTable alloc] initWithFormat:imageFormat imageCache:self];
-        [_imageTables setObject:imageTable forKey:formatName];
-        [_formats setObject:imageFormat forKey:formatName];
-        
-        [imageTableFiles addObject:[[imageTable tableFilePath] lastPathComponent]];
-        [imageTableFiles addObject:[[imageTable metadataFilePath] lastPathComponent]];
+        @synchronized(_imageTables) {
+            // Only initialize an image table for this format if it is needed on the current device.
+            FICImageTable *imageTable = [[FICImageTable alloc] initWithFormat:imageFormat imageCache:self];
+            [_imageTables setObject:imageTable forKey:formatName];
+            [_formats setObject:imageFormat forKey:formatName];
+            
+            [imageTableFiles addObject:[[imageTable tableFilePath] lastPathComponent]];
+            [imageTableFiles addObject:[[imageTable metadataFilePath] lastPathComponent]];
+        }
     }
 }
 
@@ -408,15 +410,17 @@ static void _FICAddCompletionBlockForEntity(NSString *formatName, NSMutableDicti
 
     NSMutableArray *formats = @[].mutableCopy;
     
-    for (NSString *key in _imageTables) {
-        FICImageTable *imageTable = [_imageTables objectForKey:key];
-        NSString *entityUUID = [entity UUID];
-        NSString *sourceImageUUID = [entity sourceImageUUID];
-        
-        BOOL imageExists = [imageTable entryExistsForEntityUUID:entityUUID sourceImageUUID:sourceImageUUID];
-        
-        if (imageExists) {
-            [formats addObject:imageTable.imageFormat];
+    @synchronized(_imageTables) {
+        for (NSString *key in _imageTables) {
+            FICImageTable *imageTable = [_imageTables objectForKey:key];
+            NSString *entityUUID = [entity UUID];
+            NSString *sourceImageUUID = [entity sourceImageUUID];
+            
+            BOOL imageExists = [imageTable entryExistsForEntityUUID:entityUUID sourceImageUUID:sourceImageUUID];
+            
+            if (imageExists) {
+                [formats addObject:imageTable.imageFormat];
+            }
         }
     }
     
