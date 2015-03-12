@@ -246,9 +246,9 @@ static NSInteger FICUseCacheDirectory = 1;
     }
 }
 
-+ (NSArray *)existingOnDiskImageFormats {
++ (NSArray *)existingOnDiskMetadatas {
     
-    NSMutableArray *formats = @[].mutableCopy;
+    NSMutableArray *metadatas = @[].mutableCopy;
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSString *directoryPath = [FICImageTable directoryPath];
@@ -256,11 +256,34 @@ static NSInteger FICUseCacheDirectory = 1;
     
     for (NSString *fileName in fileNames) {
         if ([fileName.pathExtension isEqualToString:FICImageTableMetadataFileExtension]) {
-            
+            NSString *fullPath = [directoryPath stringByAppendingPathComponent:fileName];
+            NSData *metadataData = [NSData dataWithContentsOfFile:fullPath];
+            NSDictionary *metadata = [NSJSONSerialization JSONObjectWithData:metadataData
+                                                                     options:kNilOptions
+                                                                       error:NULL];
+            if (metadata) {
+                [metadatas addObject:metadata];
+            }
         }
     }
     
-    return formats;
+    return metadatas;
+}
+
++ (NSArray *)existingOnDiskImageFormats {
+
+    NSMutableArray *existingFormats = @[].mutableCopy;
+    NSArray *existingMetadatas = [self existingOnDiskMetadatas];
+    
+    NSArray *formats = [existingMetadatas valueForKeyPath:@"format"];
+    for (NSDictionary *format in formats) {
+        FICImageFormat *imageFormat = [FICImageFormat formatWithDictionaryRepresentation:format];
+        if (imageFormat) {
+            [existingFormats addObject:imageFormat];
+        }
+    }
+    
+    return existingFormats;
 }
 
 #pragma mark - Working with Chunks

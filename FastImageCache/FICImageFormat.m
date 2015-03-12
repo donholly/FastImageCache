@@ -179,6 +179,23 @@ static NSString *const FICImageFormatProtectionModeKey = @"protectionMode";
     return dictionaryRepresentation;
 }
 
++ (FICImageFormat *)formatWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation {
+    
+    CGSize imageSize = CGSizeMake([dictionaryRepresentation[FICImageFormatWidthKey] unsignedIntegerValue],
+                                  [dictionaryRepresentation[FICImageFormatHeightKey] unsignedIntegerValue]);
+    
+    FICImageFormat *format =
+    [FICImageFormat formatWithName:dictionaryRepresentation[FICImageFormatNameKey]
+                            family:dictionaryRepresentation[FICImageFormatFamilyKey]
+                         imageSize:imageSize
+                             style:[dictionaryRepresentation[FICImageFormatStyleKey] intValue]
+                      maximumCount:[dictionaryRepresentation[FICImageFormatMaximumCountKey] unsignedIntegerValue]
+                           devices:[dictionaryRepresentation[FICImageFormatDevicesKey] intValue]
+                    protectionMode:[dictionaryRepresentation[FICImageFormatProtectionModeKey] unsignedIntegerValue]];
+    
+    return format;
+}
+
 #pragma mark - Protocol Implementations
 
 #pragma mark - NSObject (NSCopying)

@@ -126,12 +126,9 @@ static FICImageCache *__imageCache = nil;
 }
 
 - (NSUInteger)loadExistingFormats {
-    NSUInteger numberOfFormats = 0;
-    dispatch_sync([FICImageCache dispatchQueue], ^{
-        NSArray *formats = [FICImageTable existingOnDiskImageFormats];
-        NSLog(@"%@", formats);
-    });
-    return numberOfFormats;
+    NSArray *existingFormats = [FICImageTable existingOnDiskImageFormats];
+    [self addFormats:existingFormats];
+    return existingFormats.count;
 }
 
 - (void)addFormats:(NSArray *)formats {

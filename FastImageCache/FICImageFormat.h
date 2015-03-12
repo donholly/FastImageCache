@@ -179,4 +179,6 @@ typedef NS_ENUM(NSUInteger, FICImageFormatProtectionMode) {
  */
 + (instancetype)formatWithName:(NSString *)name family:(NSString *)family imageSize:(CGSize)imageSize style:(FICImageFormatStyle)style maximumCount:(NSInteger)maximumCount devices:(FICImageFormatDevices)devices protectionMode:(FICImageFormatProtectionMode)protectionMode;
 
++ (FICImageFormat *)formatWithDictionaryRepresentation:(NSDictionary *)dictionaryRepresentation;
+
 @end

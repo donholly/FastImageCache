@@ -75,9 +75,12 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
 - (void)setFormats:(NSArray *)formats;
 
 /**
- Loads the existing formats that exist on disk (from a previous launch)
+ Sets the image formats to be used by the image cache.
  
- @return The number of formats that were loaded.
+ @param formats An array of `<FICImageFormat>` objects.
+ 
+ @note Invoking this method will load all of the previously created image formats that are stored on disk
+        This method should not be used in conjunction with the `setFormats:` method above.
  */
 - (NSUInteger)loadExistingFormats;
 
@@ -86,7 +89,8 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
  
  @param formats An array of `<FICImageFormat>` objects.
  
- @note Once the image formats have been set, subsequent calls to this method will do nothing.
+ @note Invoking this method vs. the above `setFormats:` call will *not* cleanup unused image formats.
+        This method should not be used in conjunction with the `setFormats:` method above.
  */
 - (void)addFormats:(NSArray *)formats;
 
@@ -95,7 +99,8 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
  
  @param A single `<FICImageFormat>` object.
  
- @note Invoking this method vs. the above `setFormats:` call will *not* cleanup unused image formats. This method should not be used in conjunction with the `setFormats:` method above.
+ @note Invoking this method vs. the above `setFormats:` call will *not* cleanup unused image formats.
+        This method should not be used in conjunction with the `setFormats:` method above.
  */
 - (void)addFormat:(FICImageFormat *)imageFormat;
 
