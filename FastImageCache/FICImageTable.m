@@ -270,14 +270,14 @@ static NSInteger FICUseCacheDirectory = 1;
     return metadatas;
 }
 
-+ (NSArray *)existingOnDiskImageFormats {
++ (NSArray *)existingOnDiskImageFormatsWithClass:(Class)formatClass {
 
     NSMutableArray *existingFormats = @[].mutableCopy;
     NSArray *existingMetadatas = [self existingOnDiskMetadatas];
     
     NSArray *formats = [existingMetadatas valueForKeyPath:@"format"];
     for (NSDictionary *format in formats) {
-        FICImageFormat *imageFormat = [FICImageFormat formatWithDictionaryRepresentation:format];
+        FICImageFormat *imageFormat = [formatClass formatWithDictionaryRepresentation:format];
         if (imageFormat) {
             [existingFormats addObject:imageFormat];
         }

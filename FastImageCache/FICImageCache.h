@@ -82,7 +82,7 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
  @note Invoking this method will load all of the previously created image formats that are stored on disk
         This method should not be used in conjunction with the `setFormats:` method above.
  */
-- (NSUInteger)loadExistingFormats;
+- (NSUInteger)loadExistingFormatsWithClass:(Class)formatClass;
 
 /**
  Adds image formats to be used by the image cache.

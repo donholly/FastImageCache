@@ -83,7 +83,7 @@ extern NSString *const FICImageTableScreenScaleKey;
  
  @return An array of `FICImageFormat` objects
  */
-+ (NSArray *)existingOnDiskImageFormats;
++ (NSArray *)existingOnDiskImageFormatsWithClass:(Class)formatClass;
 
 ///----------------------------------
 /// @name Initializing an Image Table
