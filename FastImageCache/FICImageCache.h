@@ -75,6 +75,13 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
 - (void)setFormats:(NSArray *)formats;
 
 /**
+ Loads the existing formats that exist on disk (from a previous launch)
+ 
+ @return The number of formats that were loaded.
+ */
+- (NSUInteger)loadExistingFormats;
+
+/**
  Adds image formats to be used by the image cache.
  
  @param formats An array of `<FICImageFormat>` objects.

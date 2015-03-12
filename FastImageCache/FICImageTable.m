@@ -246,6 +246,23 @@ static NSInteger FICUseCacheDirectory = 1;
     }
 }
 
++ (NSArray *)existingOnDiskImageFormats {
+    
+    NSMutableArray *formats = @[].mutableCopy;
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *directoryPath = [FICImageTable directoryPath];
+    NSArray *fileNames = [fileManager contentsOfDirectoryAtPath:directoryPath error:nil];
+    
+    for (NSString *fileName in fileNames) {
+        if ([fileName.pathExtension isEqualToString:FICImageTableMetadataFileExtension]) {
+            
+        }
+    }
+    
+    return formats;
+}
+
 #pragma mark - Working with Chunks
 
 - (FICImageTableChunk *)_cachedChunkAtIndex:(NSInteger)index {

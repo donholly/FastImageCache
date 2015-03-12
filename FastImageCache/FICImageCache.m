@@ -125,6 +125,15 @@ static FICImageCache *__imageCache = nil;
     }
 }
 
+- (NSUInteger)loadExistingFormats {
+    NSUInteger numberOfFormats = 0;
+    dispatch_sync([FICImageCache dispatchQueue], ^{
+        NSArray *formats = [FICImageTable existingOnDiskImageFormats];
+        NSLog(@"%@", formats);
+    });
+    return numberOfFormats;
+}
+
 - (void)addFormats:(NSArray *)formats {
     for (FICImageFormat *format in formats) {
         [self addFormat:format];
@@ -138,7 +147,7 @@ static FICImageCache *__imageCache = nil;
     NSString *formatName = [imageFormat name];
     FICImageFormatDevices devices = [imageFormat devices];
     if (devices & currentDevice) {
-        @synchronized(_imageTables) {
+        dispatch_sync([FICImageCache dispatchQueue], ^{
             // Only initialize an image table for this format if it is needed on the current device.
             FICImageTable *imageTable = [[FICImageTable alloc] initWithFormat:imageFormat imageCache:self];
             [_imageTables setObject:imageTable forKey:formatName];
@@ -146,7 +155,7 @@ static FICImageCache *__imageCache = nil;
             
             [imageTableFiles addObject:[[imageTable tableFilePath] lastPathComponent]];
             [imageTableFiles addObject:[[imageTable metadataFilePath] lastPathComponent]];
-        }
+        });
     }
 }
 
@@ -410,7 +419,7 @@ static void _FICAddCompletionBlockForEntity(NSString *formatName, NSMutableDicti
 
     NSMutableArray *formats = @[].mutableCopy;
     
-    @synchronized(_imageTables) {
+    dispatch_sync([FICImageCache dispatchQueue], ^{
         for (NSString *key in _imageTables) {
             FICImageTable *imageTable = [_imageTables objectForKey:key];
             NSString *entityUUID = [entity UUID];
@@ -422,7 +431,7 @@ static void _FICAddCompletionBlockForEntity(NSString *formatName, NSMutableDicti
                 [formats addObject:imageTable.imageFormat];
             }
         }
-    }
+    });
     
     return formats;
 }

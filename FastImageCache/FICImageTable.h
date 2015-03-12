@@ -78,6 +78,13 @@ extern NSString *const FICImageTableScreenScaleKey;
  */
 + (NSString *)directoryPath;
 
+/**
+ Returns the existing image formats that are saved in the cache directory
+ 
+ @return An array of `FICImageFormat` objects
+ */
++ (NSArray *)existingOnDiskImageFormats;
+
 ///----------------------------------
 /// @name Initializing an Image Table
 ///----------------------------------
