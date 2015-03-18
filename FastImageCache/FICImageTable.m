@@ -30,8 +30,6 @@ static NSString *const FICImageTableContextMapKey = @"contextMap";
 static NSString *const FICImageTableMRUArrayKey = @"mruArray";
 static NSString *const FICImageTableFormatKey = @"format";
 
-static NSInteger FICUseCacheDirectory = 1;
-
 #pragma mark - Class Extension
 
 @interface FICImageTable () {
@@ -108,37 +106,34 @@ static NSInteger FICUseCacheDirectory = 1;
     return __pageSize;
 }
 
-+ (void)useCacheDirectory:(BOOL)useCacheDirectory {
-    if (FICUseCacheDirectory == -1) {
-        NSLog(@"Directory path was already setup. This must be set before the path is created.");
-        return;
-    }
-    
-    FICUseCacheDirectory = useCacheDirectory;
-}
-
-+ (BOOL)usesCacheDirectory {
-    return FICUseCacheDirectory;
-}
-
-+ (NSString *)directoryPath {
-    static NSString *__directoryPath = nil;
-    
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSArray *paths;
-        if (FICUseCacheDirectory == 1) {
-            paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        } else {
-            paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-        }
-        FICUseCacheDirectory = -1;
-        __directoryPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"ImageTables"];
+static NSString *__directoryPath = nil;
++ (void)setDirectoryPath:(NSString *)directoryPath {
+    if (!__directoryPath) {
+        __directoryPath = [directoryPath copy];
         
         NSFileManager *fileManager = [[NSFileManager alloc] init];
         BOOL directoryExists = [fileManager fileExistsAtPath:__directoryPath];
         if (directoryExists == NO) {
             [fileManager createDirectoryAtPath:__directoryPath withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+    } else {
+        [NSException raise:NSInvalidArgumentException format:@"*** FIC Exception: %s Image Table directory path is already set.", __PRETTY_FUNCTION__];
+    }
+}
+
++ (NSString *)directoryPath {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (!__directoryPath) {
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+            
+            __directoryPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"ImageTables"];
+            
+            NSFileManager *fileManager = [[NSFileManager alloc] init];
+            BOOL directoryExists = [fileManager fileExistsAtPath:__directoryPath];
+            if (directoryExists == NO) {
+                [fileManager createDirectoryAtPath:__directoryPath withIntermediateDirectories:YES attributes:nil error:nil];
+            }
         }
     });
     
