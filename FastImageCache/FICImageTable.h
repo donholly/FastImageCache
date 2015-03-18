@@ -85,6 +85,13 @@ extern NSString *const FICImageTableScreenScaleKey;
  */
 + (NSArray *)existingOnDiskImageFormatsWithClass:(Class)formatClass;
 
+/**
+ Returns the dispatch queue used for loading and saving metadata
+ 
+ @return A dispatch queue used for metadata
+ */
++ (dispatch_queue_t)metadataQueue;
+
 ///----------------------------------
 /// @name Initializing an Image Table
 ///----------------------------------

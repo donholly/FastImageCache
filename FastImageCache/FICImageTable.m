@@ -720,6 +720,15 @@ static void _FICReleaseImageData(void *info, const void *data, size_t size) {
 
 #pragma mark - Working with Metadata
 
+static dispatch_queue_t __metadataQueue = nil;
++ (dispatch_queue_t)metadataQueue {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        __metadataQueue = dispatch_queue_create("com.path.FastImageCache.ImageTableMetadataQueue", NULL);
+    });
+    return __metadataQueue;
+}
+
 static long long __metadataVersion = 0;
 - (void)saveMetadata {
     [_lock lock];
@@ -740,7 +749,7 @@ static long long __metadataVersion = 0;
     });
     
     __block long long metadataVersion = __metadataVersion;
-    dispatch_async(__metadataQueue, ^{
+    dispatch_async([FICImageTable metadataQueue], ^{
         NSError *writeError = nil;
         
         // Cancel serialization if a new metadata version is queued to be saved
