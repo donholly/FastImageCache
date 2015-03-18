@@ -143,10 +143,17 @@ static FICImageCache *__imageCache = nil;
     
     NSString *formatName = [imageFormat name];
     FICImageFormatDevices devices = [imageFormat devices];
+    // Only initialize an image table for this format if it is needed on the current device.
     if (devices & currentDevice) {
+        __block FICImageTable *imageTable;
+        
+        // Do all things metadata related on metadata queue
+        dispatch_sync([FICImageTable metadataQueue], ^{
+            imageTable = [[FICImageTable alloc] initWithFormat:imageFormat imageCache:self];
+        });
+        
+        // Do all things image cache related on image cache queue
         dispatch_sync([FICImageCache dispatchQueue], ^{
-            // Only initialize an image table for this format if it is needed on the current device.
-            FICImageTable *imageTable = [[FICImageTable alloc] initWithFormat:imageFormat imageCache:self];
             [_imageTables setObject:imageTable forKey:formatName];
             [_formats setObject:imageFormat forKey:formatName];
             
