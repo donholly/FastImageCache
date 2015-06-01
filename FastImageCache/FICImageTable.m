@@ -106,6 +106,21 @@ static NSString *const FICImageTableFormatKey = @"format";
     return __pageSize;
 }
 
++ (unsigned long long)currentCacheSize {
+
+    NSError *error;
+    unsigned long long size = 0;
+    
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:__directoryPath error:&error];
+    for (NSString *file in contents) {
+        NSString *filePath = [__directoryPath stringByAppendingPathComponent:file];
+        unsigned fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&error] fileSize];
+        size += fileSize;
+    }
+    
+    return size;
+}
+
 static NSString *__directoryPath = nil;
 + (void)setDirectoryPath:(NSString *)directoryPath {
     if (!__directoryPath) {

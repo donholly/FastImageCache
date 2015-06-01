@@ -58,6 +58,13 @@ extern NSString *const FICImageTableScreenScaleKey;
 + (int)pageSize;
 
 /**
+ Returns the current disk space consumed by FastImageCache
+ 
+ @return The number of bytes consumed by the `directoryPath`
+ */
++ (unsigned long long)currentCacheSize;
+
+/**
  Specifies where to store the image table files and metadata
 
  @param directoryPath - file system path to store image table files and metadata

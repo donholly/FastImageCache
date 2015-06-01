@@ -458,6 +458,70 @@ static void _FICAddCompletionBlockForEntity(NSString *formatName, NSMutableDicti
     [imageTable deleteEntryForEntityUUID:entityUUID];
 }
 
+- (void)deleteLeastRecentlyAccessedTable {
+    
+    NSString *imageTablesPath = [FICImageTable directoryPath];
+    
+    if (!imageTablesPath) {
+        return;
+    }
+    
+    NSError* error = nil;
+    NSArray* filesArray = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:imageTablesPath error:&error];
+    if(error != nil) {
+        NSLog(@"Error in reading files: %@", [error localizedDescription]);
+        return;
+    }
+    
+    // sort by creation date
+    NSMutableArray* filesAndProperties = [NSMutableArray arrayWithCapacity:[filesArray count]];
+    for(NSString* file in filesArray) {
+        if ([file.pathExtension isEqualToString:@"imageTable"])  {
+            NSString* filePath = [imageTablesPath stringByAppendingPathComponent:file];
+            NSDictionary* properties = [[NSFileManager defaultManager]
+                                        attributesOfItemAtPath:filePath
+                                        error:&error];
+            NSDate* modDate = [properties objectForKey:NSFileModificationDate];
+            
+            if(error == nil) {
+                [filesAndProperties addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                               file, @"path",
+                                               modDate, @"lastModDate",
+                                               nil]];
+            }
+        }
+    }
+    
+    // sort using a block
+    // order inverted as we want latest date first
+    NSArray* sortedFiles = [filesAndProperties sortedArrayUsingComparator:
+                            ^(id path1, id path2)
+                            {
+                                // compare
+                                NSComparisonResult comp = [[path1 objectForKey:@"lastModDate"] compare:
+                                                           [path2 objectForKey:@"lastModDate"]];
+                                return comp;
+                            }];
+    
+    NSString *leastRecentlyAccessedFileName;
+    NSString *formatName;
+    FICImageTable *imageTable;
+    
+    for (NSDictionary *file in sortedFiles) {
+        leastRecentlyAccessedFileName = [file valueForKey:@"path"];
+        NSString *filePath = [imageTablesPath stringByAppendingPathComponent:leastRecentlyAccessedFileName];
+        formatName = [leastRecentlyAccessedFileName substringToIndex:[leastRecentlyAccessedFileName rangeOfString:@".imageTable"].location];
+        imageTable = [_imageTables valueForKey:formatName];
+        
+        if (imageTable) {
+            if ([[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&error] fileSize] > 0) {
+                [imageTable reset];
+                break;
+            }
+        }
+    }
+}
+
 - (void)cancelImageRetrievalForEntity:(id <FICEntity>)entity withFormatName:(NSString *)formatName {
     NSURL *sourceImageURL = [entity sourceImageURLWithFormatName:formatName];
     NSMutableDictionary *requestDictionary = [_requests objectForKey:sourceImageURL];

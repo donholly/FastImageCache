@@ -208,6 +208,11 @@ typedef void (^FICImageRequestCompletionBlock)(UIImage *sourceImage);
  */
 - (void)deleteImageForEntity:(id <FICEntity>)entity withFormatName:(NSString *)formatName;
 
+/**
+ Deletes least recently accessed image table
+ */
+- (void)deleteLeastRecentlyAccessedTable;
+
 ///-------------------------------
 /// @name Canceling Image Requests
 ///-------------------------------
