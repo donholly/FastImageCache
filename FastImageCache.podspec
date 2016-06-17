@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
                   }
   
   s.requires_arc = true
-  s.ios_deployment_target = "5.0"
+  s.ios.deployment_target = "5.0"
   s.source       = { :git => "https://github.com/path/FastImageCache.git", :tag => "1.3" }
   s.source_files = "FastImageCache"
 
